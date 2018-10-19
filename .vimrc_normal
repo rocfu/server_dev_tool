@@ -1,0 +1,208 @@
+
+" Use Vim settings, rather than Vi settings (much better!).
+" This must be first, because it changes other options as a side effect.
+set nocompatible
+
+" encoding
+set termencoding=GBK
+set enc=GBK
+set fileencoding=GBK
+
+" general
+set nu
+set ic
+set hlsearch
+set history=50          " keep 50 lines of command line history
+set ruler               " show the cursor position all the time
+set incsearch           " do incremental searching
+set autowrite
+set nobackup
+set nowritebackup
+set showcmd          
+set noeb
+set confirm
+
+filetype plugin indent on 
+
+" indent space ...
+set smartindent
+set tabstop=4
+set shiftwidth=4
+" allow backspacing over everything in insert mode
+set backspace=indent,eol,start
+" set expandtab
+autocmd filetype python setlocal list noexpandtab shiftwidth=4 softtabstop=4 tabstop=4
+autocmd FileType text setlocal textwidth=78
+
+set listchars=tab:>\ ,trail:-
+
+" color
+syntax enable
+set background=dark
+
+" rec last file position
+autocmd BufReadPost *
+			\ if line("'\"") > 1 && line("'\"") <= line("$") |
+			\   exe "normal! g`\"" |
+			\ endif
+
+" map
+map <F2> :call BuildTagsAll()<CR>
+map <F3> :call LpcEval()<CR><CR>
+map <F4> :call UpdateLpc()<CR>
+map <F5> :e! %<CR>
+map <F6> :call AddTitle()
+map <F8> :call OpenLeftTlist()<CR>
+map <F9> :call OpenRightTlist()<CR>
+map <F10> :mksession! session.vim<CR>
+map <F11> :source session.vim<CR>
+
+" map svn or git
+map <C-k>1 :!svn diff % \| less<CR>
+map <C-k>2 :!svn diff --diff-cmd diffwrap %<CR>
+map <C-k>3 :!svn log -v %\| less<CR>
+map <C-k>4 :!svn up %<CR>
+map <C-k>5 :<C-U>!svn blame % \| sed -n "<C-R>=line(".")<CR>,<C-R>=line(".")<CR>p"<CR>
+vmap <C-k>5 :<C-U>!svn blame % \| sed -n "<C-R>=line("'<")<CR>,<C-R>=line("'>")<CR>p"<CR>
+map <C-k>6 :!svn st \| less<CR>
+
+" map grep
+map <C-k>7 :!grep --color=always --exclude=*.svn-base --exclude=*.b --exclude=*.o -nr "\<<C-R>=expand("<cword>")<CR>\>" % \|less -R<CR>
+map <C-k>8 :!grep --color=always --exclude=*.svn-base --exclude=*.b --exclude=*.o --exclude=*.svn-base -nr "\<<C-R>=expand("<cword>")<CR>\>"  \|less -R ODODODODODODODODODOD
+map <C-k>9 :!grep --color=always --exclude=*.svn-base --exclude=*.b --exclude=*.o -nr  <C-R>0 % \|less -R<CR>
+map <C-k>0 :!grep --color=always --exclude=*.svn-base --exclude=*.b --exclude=*.o --exclude=*.svn-base -nr <C-R>0  \|less -R ODODODODODODODODODOD
+
+" map cscope
+nmap <C-[>s :vert scs find s <C-R>=expand("<cword>")<CR><CR>
+nmap <C-[>g :vert scs find g <C-R>=expand("<cword>")<CR><CR>
+nmap <C-[>c :vert scs find c <C-R>=expand("<cword>")<CR><CR>
+nmap <C-[>t :vert scs find t <C-R>=expand("<cword>")<CR><CR>
+nmap <C-[>e :vert scs find e <C-R>=expand("<cword>")<CR><CR>
+nmap <C-[>f :vert scs find f <C-R>=expand("<cfile>")<CR><CR>
+nmap <C-[>F :vert scs find f <C-R>=expand("<cword>")<CR><CR>
+nmap <C-[>i :vert scs find i <C-R>=expand("<cword>")<CR><CR>
+nmap <C-[>d :vert scs find d <C-R>=expand("<cword>")<CR><CR>
+nmap <C-[>a :vert scs find d <C-R>=expand("<cword>")<CR><CR>
+
+nmap <C-\>s :cs find s <C-R>=expand("<cword>")<CR><CR>
+nmap <C-\>g :cs find g <C-R>=expand("<cword>")<CR><CR>
+nmap <C-\>c :cs find c <C-R>=expand("<cword>")<CR><CR>
+nmap <C-\>t :cs find t <C-R>=expand("<cword>")<CR><CR>
+nmap <C-\>e :cs find e <C-R>=expand("<cword>")<CR><CR>
+nmap <C-\>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
+nmap <C-\>F :cs find f <C-R>=expand("<cword>")<CR><CR>
+nmap <C-\>i :cs find i <C-R>=expand("<cword>")<CR><CR>
+nmap <C-\>d :cs find d <C-R>=expand("<cword>")<CR><CR>
+nmap <C-\>a :cs find a <C-R>=expand("<cword>")<CR><CR>
+
+nmap <C-p>s :scs find s <C-R>=expand("<cword>")<CR><CR>
+nmap <C-p>g :scs find g <C-R>=expand("<cword>")<CR><CR>
+nmap <C-p>c :scs find c <C-R>=expand("<cword>")<CR><CR>
+nmap <C-p>t :scs find t <C-R>=expand("<cword>")<CR><CR>
+nmap <C-p>e :scs find e <C-R>=expand("<cword>")<CR><CR>
+nmap <C-p>f :scs find f <C-R>=expand("<cfile>")<CR><CR>
+nmap <C-p>F :scs find f <C-R>=expand("<cword>")<CR><CR>
+nmap <C-p>i :scs find i <C-R>=expand("<cword>")<CR><CR>
+nmap <C-p>d :scs find d <C-R>=expand("<cword>")<CR><CR>
+nmap <C-p>a :scs find a <C-R>=expand("<cword>")<CR><CR>
+
+" map other
+map <C-a>1 :vsp log/debug.log<CR>
+map <C-a>2 :vsp log/sys/error.dat<CR>
+map <C-a>4 :call UpdateLpcSvnChange()<CR>
+map <C-a>p :let @p=@%<CR>
+map <C-a>t :call FormatLpc()<CR>
+
+" map auto complement
+:inoremap ( ()<ESC>i
+:inoremap ) <c-r>=ClosePair(')')<CR>
+:inoremap [ []<ESC>i
+:inoremap ] <c-r>=ClosePair(']')<CR>
+:inoremap } <c-r>=ClosePair('}')<CR>
+:inoremap ' ''<ESC>i
+:inoremap " ""<ESC>i
+
+autocmd FileType py :inoremap { {}<ESC>i
+autocmd FileType c,cpp,h,awk,go :inoremap { {<CR>}<ESC>O
+autocmd FileType c,cpp,h :inoremap ({ ({})<ESC>hi
+autocmd FileType c,cpp,h :inoremap ([ ([])<ESC>hi
+
+function! ClosePair(char)
+    if getline('.')[col('.') - 1] == a:char
+        return "\<Right>"
+    else
+        return a:char
+    endif
+endfunction
+
+let Tlist_Show_One_File = 1
+""let Tlist_Exit_OnlyWindow = 1
+""let Tlist_Display_Prototype = 1
+""let Tlist_Use_Right_Window = 1
+
+" 打开Tlist窗口控制
+function OpenLeftTlist()
+	:let g:Tlist_Use_Right_Window = 0
+	:Tlist 
+endfunction
+
+function OpenRightTlist()
+	:let g:Tlist_Use_Right_Window = 1
+	:Tlist 
+endfunction
+
+function LpcEval()
+	:!rm mytest.c
+	:!ln -s ~/dh2/mytest.c mytest.c
+	:vsp mytest.c
+endfunction
+
+" update lpc script 
+function UpdateLpc()
+	:!bash -c "echo % > etc/update && tail -0f log/god/autoupdate.dat log/sys/error.dat"
+endfunction
+
+" update all lpc script
+function UpdateLpcSvnChange()
+	:!bash -c 'changefile=`svn st | egrep "^M|^A" | cut -w -f2 | grep "\.c"`; if [ \! -n "$changefile" ];then echo "No changed or added files"; exit; else echo $changefile | tr " " "\n" | tee etc/update && tail -0f log/god/autoupdate.dat; fi'
+endfunction
+
+" lpc format
+function FormatLpc()
+	:%s/if(/if (/gc 
+	:%s/foreach(/foreach (/gc 
+	:%s/for(/for (/gc 
+	:%s/( /(/gc 
+	:%s/({ /({/gc 
+	:%s/(\[ /(\[/gc 
+	:%s/ })/})/gc 
+	:%s/ ])/])/gc 
+	:%s/ )/)/gc 
+	:%s/":/" :/gc 
+endfunction
+
+" cscope
+if filereadable("cscope.out")
+	cs add cscope.out
+endif
+
+"ctags"
+set tags+=./tags 
+ 
+" cscope, extags
+function BuildTagsAll()
+	:!cscope -Rbq & 
+	:!exctags -R ./ ~/dh2/trunk/os/ &
+	"":!exctags -R cmd/* char/* sys/* include/* ~/dh2/trunk/os/txe/* ~/dh2/trunk/os/include/* ~/tags_normal.c &
+endfunction
+
+" For comment
+function AddTitle()
+        call setline(1, "//////////////////////////////////////////////////////////////////////////////////")
+        call append(1, "//File          :  " . expand("%"))
+        call append(2, "//Description   :  ")  
+        call append(3, "//By            :  fuzhipeng - gzfuzhipeng@corp.netease.com")
+        call append(4, "//Created       :  " . strftime("%F %R"))
+        call append(5, "///////////////////////////////////////////////////////////////////////////////////")   
+endf
+
